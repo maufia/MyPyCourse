@@ -1,4 +1,4 @@
-"""Learn spawning different processes in python"""
+"""Learn spawning different processes in python, using Multiprocessing"""
 
 
 import multiprocessing
@@ -9,8 +9,9 @@ import click
 
 
 ABOUT = """
-This program compares serially call a function versus
-parallelize the function calls
+This program compares serially call a function versus parallelize the function calls.
+Parallelization uses the 'multiprocessing' standard library. 
+It should work both in Linux and Windows
 """
 
 
