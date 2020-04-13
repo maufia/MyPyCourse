@@ -1,4 +1,4 @@
-"""Learn different command arguments."""
+"""Learn different passages to pass command arguments."""
 
 import time
 import random
@@ -7,6 +7,8 @@ import click
 
 ABOUT = """
 This program uses different command line parsers.
+
+Select either 'argparse' or 'click' by uncommenting the lines at the end of the file 
 """
 
 
@@ -96,5 +98,7 @@ def get_arguments_with_click() -> True:
 
 
 if __name__ == "__main__":
+    # Uncomment this for 'argparser'
     # get_arguments_with_argparse()
+    # Uncomment this for 'click'
     get_arguments_with_click()
