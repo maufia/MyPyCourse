@@ -7,7 +7,7 @@ import timeit
 
 
 ABOUT = """
-This program uses argparse as command line parsers.
+This program uses 'argparse' as command line parsers.
 """
 
 
@@ -29,7 +29,7 @@ def time_function(function_name: str, my_filename: str, n_retries: int = 20) -> 
 
     :param my_filename: the string to be passed to my_solver
     :param function_name: Name of function to be timed
-    :param n_retry: Number of times the function is run to improve the average
+    :param n_retries: Number of times the function is run to improve the average
     :return: True
     """
     meas_time = timeit.timeit(f"{function_name}('{my_filename}')",
