@@ -23,7 +23,7 @@ def my_solver(filename: str) -> str:
     return filename
 
 
-def time_function(function_name: str, my_filename: str, n_retries: int = 20) -> True:
+def time_function(function_name: str, my_filename: str, n_retries: int = 10) -> True:
     """
     Timing function
 
@@ -35,7 +35,7 @@ def time_function(function_name: str, my_filename: str, n_retries: int = 20) -> 
     meas_time = timeit.timeit(f"{function_name}('{my_filename}')",
                               setup="from __main__ import " + function_name,
                               number=n_retries, globals=globals())
-    average_time = meas_time / n_retries
+    average_time = round(meas_time / n_retries, 2)
     print(f"Average time of {function_name}: {average_time}s")
     return True
 
@@ -61,6 +61,9 @@ def get_arguments_with_argparse() -> True:
         parser.add_argument('-t', '--timing',
                             help='Run timer for each function',
                             action='store_true')
+        parser.add_argument('-n', '--n_retries', default=10,
+                            help='Number of retries used by timit',
+                            type=int)
         parser.add_argument('filename',
                             help='Input filename')
         return parser.parse_args()
@@ -72,8 +75,10 @@ def get_arguments_with_argparse() -> True:
         my_solver(input_args.filename)
 
     if input_args.timing is True:
-        # call the 'timit' function
-        time_function('my_solver', my_filename=input_args.filename)
+        # call the 'timing' function
+        print(f'Timing "my_solve"')
+        time_function('my_solver', my_filename=input_args.filename,
+                      n_retries=input_args.n_retries)
         pass
 
     return True
