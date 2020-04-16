@@ -35,7 +35,8 @@ def parallel_calls(n_calls: int) -> True:
     """
     print(f"Call my_call in parallel {n_calls} times")
     with multiprocessing.Pool(n_calls) as mpp:
-        mpp.map(my_calls, range(n_calls))
+        delay = mpp.map(my_calls, range(n_calls))
+    print(delay)
 
 
 def iter_calls(n_calls: int) -> True:
@@ -59,7 +60,7 @@ def timing_function(function_to_time: str, n_calls: int) -> True:
     :return: True
     """
     print(f"*** Start timing the function {function_to_time}")
-    n_retry = 4
+    n_retry = 6
     measured_time = timeit.timeit(f"{function_to_time}({n_calls})",
                                   setup=f"from __main__ import {function_to_time}",
                                   number=n_retry)
