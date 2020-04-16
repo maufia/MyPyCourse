@@ -60,7 +60,7 @@ def get_arguments_with_click() -> True:
         click.echo(f'Passed filename: {filename}')
 
     @cli.command(help='Runs timer for each function')
-    @click.option('--n_retries', '-n', default=10,
+    @click.option('--n_retries', '-n', default=5,
                   type=click.IntRange(1, 1e6),
                   help='Number of retries for timing operation.\n' +
                        'DEFAULT=100, RANGE=[1..1E6]')
