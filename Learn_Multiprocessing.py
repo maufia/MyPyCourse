@@ -94,17 +94,17 @@ def get_arguments() -> True:
         ctx.obj['n_calls'] = n_calls
         ctx.obj['n_retries'] = n_retries
 
-    @cli.command(help='Call solver iteratively')
+    @cli.command('iter', help='Call solver iteratively')
     @click.pass_context
     def time_iter(ctx):
         """Call the timine to the iterator function"""
         timing_function('iter_calls', ctx.obj['n_calls'], ctx.obj['n_retries'])
 
-    @cli.command(help='Call solver in parallel')
+    @cli.command('parallel', help='Call solver in parallel')
     @click.pass_context
     def time_parallel(ctx):
         """Call the timing of the parallelized function"""
-        timing_function('parallel_calls', ctx.obj['n_calls'], ctx.obj['n_retries'])
+        timing_function('paraaddllel_calls', ctx.obj['n_calls'], ctx.obj['n_retries'])
 
     cli(obj={})
 
