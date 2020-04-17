@@ -104,7 +104,7 @@ def get_arguments() -> True:
     @click.pass_context
     def time_parallel(ctx):
         """Call the timing of the parallelized function"""
-        timing_function('paraaddllel_calls', ctx.obj['n_calls'], ctx.obj['n_retries'])
+        timing_function('parallel_calls', ctx.obj['n_calls'], ctx.obj['n_retries'])
 
     cli(obj={})
 
