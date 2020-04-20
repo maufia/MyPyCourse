@@ -5,10 +5,9 @@ import os
 import easygui as eg
 import csv
 import matplotlib.pyplot as plt
-import click
+
 
 TITLE = """Learn - Matplotlib """
-
 
 
 def select_file() -> str:
@@ -103,26 +102,41 @@ def display_original_data(data: dict) -> True:
 def display_per_nation(data: dict) -> True:
     all_countries = data['orig']['x']
     all_values = data['orig']['values']
-    pie_labels, pie_sizes = [], []
-    for [cnt, value] in enumerate(all_values):
-        if value >= 50:
+    max_size = 70
+    pie_labels, pie_sizes = [f'Rest of the World'], [0]
+    for cnt, value in enumerate(all_values):
+        if value >= max_size:
             pie_labels.append(all_countries[cnt])
             pie_sizes.append(value)
-    print(pie_sizes)
-    explode = [0 for _ in pie_sizes]
-    explode[pie_sizes.index(max(pie_sizes))] = .1
+        else:
+            pie_sizes[0] += value
+    explode = [0.0 for _ in pie_sizes]
+    maximum_size: int = pie_sizes.index(max(pie_sizes))
+    explode[maximum_size] = .3
 
-    fig, ax = plt.subplots()
-    ax.pie(pie_sizes, labels=pie_labels, explode=explode, shadow=True,)
-    ax.axis('equal')    # Equal aspect ratio ensures that pie is drawn as a circle.
+    fig1, ax1 = plt.subplots()
+    fig1.suptitle(f"Analysis of searches for {data['orig']['Name values']}")
+    ax1.pie(pie_sizes, labels=pie_labels, explode=explode,
+            shadow=True, autopct='%1.1f%%')
+    # ax1.axis('equal')    # Equal aspect ratio ensures that pie is drawn as a circle.
+
+    fig2, ax2 = plt.subplots()
+    fig2.suptitle(f"Analysis of searches for {data['orig']['Name values']}")
+    ax2.barh(pie_labels, pie_sizes)
+    ax2.set_yticks(range(len(pie_labels)))
+    ax2.set_yticklabels(pie_labels)
+    ax2.invert_yaxis()  # labels read top-to-bottom
+    ax2.set_xlabel('Searches')
+    fig2.subplots_adjust(left=0.2, right=1.0)
+
     plt.show()
     return True
 
 
 def select_operation(data) -> True:
     """"""
-    all_choices = {'Display\nmonthly\ntrend': display_original_data,
-                   'Display\nnational\ndata': display_per_nation}
+    all_choices = {'Monthly trend': display_original_data,
+                   'National data': display_per_nation}
     # Use Gui to select a choice
     choice: str = eg.buttonbox(msg="Select what to display", title=TITLE,
                                choices=list(all_choices.keys()),
@@ -168,6 +182,8 @@ def main() -> True:
 
 
 if __name__ == "__main__":
+    import click
+
     @click.group(help=TITLE)
     def cli():
         pass
@@ -185,9 +201,9 @@ if __name__ == "__main__":
 
     @cli.command('disp')
     def cli_disp():
-        data = {'orig': {'filename': os.path.join('Data', 'trends_cupcakes.csv')}}
+        data = {'orig': {'filename': os.path.join('Data', 'geoMap_cupcakes.csv')}}
         data = read_file(data)
-        display_original_data(data)
+        display_per_nation(data)
 
 
     cli(obj={})
