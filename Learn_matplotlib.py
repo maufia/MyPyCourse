@@ -83,7 +83,7 @@ def display_original_data(data: dict) -> True:
     ax[1].plot(time, data['orig']['values'], '.r')
     ax[1].set_xlabel('time [months]')
     ax[1].set_ylabel('Number of searches')
-    ax[1].set_title('Searches per number of months')
+    ax[1].set_title('Monthly searches')
     ax[1].grid()
     # proper axis and ticks
     labels = ax[1].get_xticklabels()
@@ -199,7 +199,7 @@ if __name__ == "__main__":
         assert failures_count == 0, 'Test failure... bailing out'
         print(f'All {test_count} tests passed')
 
-    @cli.command('disp')
+    @cli.command('disp', help='display short cut')
     def cli_disp():
         data = {'orig': {'filename': os.path.join('Data', 'geoMap_cupcakes.csv')}}
         data = read_file(data)
