@@ -7,7 +7,8 @@ import csv
 import matplotlib.pyplot as plt
 import click
 
-TITLE = "Learn - Matplotlib"
+TITLE = """Learn - Matplotlib """
+
 
 
 def select_file() -> str:
@@ -34,7 +35,7 @@ def read_file(data: dict) -> dict:
     >>> read_file(data)['orig']['Name values']
     'Cupcake: (Worldwide)'
     """
-    data['orig']['time'] = []
+    data['orig']['x'] = []
     data['orig']['values'] = []
     with open(data['orig']['filename']) as csvfile:
         for row_count, row in enumerate(csv.reader(csvfile, delimiter=',')):
@@ -44,11 +45,14 @@ def read_file(data: dict) -> dict:
                 data['orig']['category'] = row[0]
                 continue
             if row_count == 2:
-                data['orig']['Name time-line'] = row[0]
+                data['orig']['Name x-line'] = row[0]
                 data['orig']['Name values'] = row[1]
             else:
-                data['orig']['time'].append(row[0])
-                data['orig']['values'].append(row[1])
+                data['orig']['x'].append(row[0])
+                try:
+                    data['orig']['values'].append(int(row[1]))
+                except ValueError:
+                    data['orig']['values'].append(0)
     return data
 
 
@@ -58,28 +62,69 @@ def display_original_data(data: dict) -> True:
 
     :param data: data set to display needs 'time' and 'values'
     :return: True
+
+    >>> data= {'orig': {'filename': os.path.join('Data', 'trends_cupcakes.csv')}}
+    >>> data = read_file(data)
+    >>> display_original_data(data)
+    True
     """
-    time = range(len(data['orig']['time']))
-    fig, ax = plt.subplots()
-    ax.plot(time, data['orig']['values'], '.b')
-    ax.set(xlabel='time [months]', ylabel='Number of searches',
-           title=f"Analysis of searches for {data['orig']['Name values']}")
-    ax.grid()
+    time = range(len(data['orig']['x']))
+    # open figure
+    fig = plt.figure()
+    fig.suptitle(f"Analysis of searches for {data['orig']['Name values']}")
+    # set up 2 subplots
+    ax = fig.subplots(nrows=2, ncols=1)
+    # first subplot
+    ax[0].plot(time, data['orig']['values'], '.b')
+    ax[0].set(xlabel='time [months]', ylabel='Number of searches',
+              title='Searches per number of months')
+    ax[0].grid()
+
+    # second plot
+    ax[1].plot(time, data['orig']['values'], '.r')
+    ax[1].set_xlabel('time [months]')
+    ax[1].set_ylabel('Number of searches')
+    ax[1].set_title('Searches per number of months')
+    ax[1].grid()
+    # proper axis and ticks
+    labels = ax[1].get_xticklabels()
+    for cnt, xtick in enumerate(ax[1].get_xticks()[0:-2]):
+        labels[cnt] = data['orig']['x'][int(xtick)]
+    ax[1].set_xticklabels(labels)
+    # Rotate the ticks
+    for tick in ax[1].get_xticklabels():
+        tick.set_rotation(55)
+    # sort out
+    fig.subplots_adjust(bottom=0.2, top=0.8, hspace=0.6)
     plt.show()
     return True
 
 
-def display_analyse_data(data: dict) -> dict:
-    return data
+def display_per_nation(data: dict) -> True:
+    all_countries = data['orig']['x']
+    all_values = data['orig']['values']
+    pie_labels, pie_sizes = [], []
+    for [cnt, value] in enumerate(all_values):
+        if value >= 50:
+            pie_labels.append(all_countries[cnt])
+            pie_sizes.append(value)
+    print(pie_sizes)
+    explode = [0 for _ in pie_sizes]
+    explode[pie_sizes.index(max(pie_sizes))] = .1
+
+    fig, ax = plt.subplots()
+    ax.pie(pie_sizes, labels=pie_labels, explode=explode, shadow=True,)
+    ax.axis('equal')    # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.show()
+    return True
 
 
 def select_operation(data) -> True:
     """"""
-    all_choices = {'Display\noriginal\ndata': display_original_data,
-                   'Display\nanalysed\ndata': display_analyse_data}
+    all_choices = {'Display\nmonthly\ntrend': display_original_data,
+                   'Display\nnational\ndata': display_per_nation}
     # Use Gui to select a choice
-    choice: str = eg.buttonbox(msg="Select what to display",
-                               title=TITLE,
+    choice: str = eg.buttonbox(msg="Select what to display", title=TITLE,
                                choices=list(all_choices.keys()),
                                image=os.path.join('Images', 'qm.png'))
 
@@ -90,6 +135,7 @@ def select_operation(data) -> True:
 
 
 def message_box(message: str) -> True:
+    message += "\n\nFor resources see: https://matplotlib.org/gallery "
     eg.msgbox(title=TITLE,
               msg=message,
               ok_button='OK',
@@ -136,5 +182,12 @@ if __name__ == "__main__":
         failures_count, test_count = doctest.testmod(verbose=False)
         assert failures_count == 0, 'Test failure... bailing out'
         print(f'All {test_count} tests passed')
+
+    @cli.command('disp')
+    def cli_disp():
+        data = {'orig': {'filename': os.path.join('Data', 'trends_cupcakes.csv')}}
+        data = read_file(data)
+        display_original_data(data)
+
 
     cli(obj={})
