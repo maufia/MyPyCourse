@@ -1,12 +1,11 @@
 """Learn EasyGUI: file selection, errors, choices and demos"""
 
 import os
-import sys
 import easygui as eg
 import click
 
 ABOUT = """Learn and examples with EasyGUI"""
-TITLE = """Learn EasyGUI"""
+EG_TITLE = """Learn EasyGUI"""
 
 
 def my_function() -> True:
@@ -23,7 +22,7 @@ def show_error_message(error_string="Error!") -> True:
     A message box can be used for alert of error, success, etc
     return: True
     """
-    eg.msgbox(title=TITLE+": Example Error",
+    eg.msgbox(title=EG_TITLE+": Example Error",
               image=os.path.join('Images', 'failure.gif'),
               msg=error_string)
     return True
@@ -32,7 +31,7 @@ def show_error_message(error_string="Error!") -> True:
 def select_file() -> True:
     """Use EasyGUI to select a function"""
     current_directory = os.getcwd()
-    selected_file = eg.fileopenbox(title=TITLE+': Open a file',
+    selected_file = eg.fileopenbox(title=EG_TITLE+': Open a file',
                                    default=os.path.join(current_directory, ".."),
                                    filetypes="*.txt,*.py")
     print(f"Selected file: {os.path.basename(selected_file)}")
@@ -42,7 +41,7 @@ def select_file() -> True:
 
 def message_box(message: str) -> True:
     message += "\n\nFor resources see:  https://pythonhosted.org/easygui/index.html"
-    eg.msgbox(title=TITLE+": message",
+    eg.msgbox(title=EG_TITLE+": message",
               msg=message,
               ok_button='OK',
               image=os.path.join('Images', 'Learn.png'))
@@ -65,7 +64,7 @@ def user_choices() -> True:
 
     # Use Gui to select a choice
     choice = eg.buttonbox(msg="Select and action",
-                          title=TITLE+': choice',
+                          title=EG_TITLE+': choice',
                           choices=list(all_choices.keys()),
                           image=os.path.join('Images', 'qm.png'))
 
@@ -73,7 +72,7 @@ def user_choices() -> True:
     all_choices[choice]()
     return True
 
-
+    
 # --------------------------------------------------
 
 
@@ -83,11 +82,13 @@ if __name__ == "__main__":
         """Main call to the CLI"""
         pass
 
+    @cli.command('run', help="Run the code", hidden=False)
+    def run_code():
+        user_choices()
+
     @cli.command('test', help="test a specific part of the code", hidden=True)
     def test_code():
         my_function()
-        sys.exit()
 
     cli(obj={})
-    # Run my function
-    user_choices()
+
