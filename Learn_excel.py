@@ -37,11 +37,11 @@ def my_function() -> dict:
     return hills_of_rome
 
 
-def write_history_sheet(workbook: Workbook) -> True:
+def set_cell_styles() -> dict:
     """
+    Options for cells
 
-    :param workbook: workbook
-    :return:
+    :return: dictionary with various cell style options
     """
     # Set fonts for title and text
     title_font = Font(name='Calibri', size=14, bold=True, italic=False,
@@ -51,28 +51,41 @@ def write_history_sheet(workbook: Workbook) -> True:
                      vertAlign=None, underline=None, strike=False,
                      color='000000')
     # Set alignments for title and text
-    tile_alignment = Alignment(horizontal='center',
-                               vertical='center',
-                               wrapText=False)
-    text_alignment = Alignment(horizontal='left',
-                               vertical='center',
+    title_alignment = Alignment(horizontal='center', vertical='center',
+                                wrapText=False)
+    text_alignment = Alignment(horizontal='left', vertical='center',
                                wrapText=False)
     border_size = Side(style='thin', color='000000')
     borders_size = Border(left=border_size, right=border_size,
                           top=border_size, bottom=border_size)
     fill_type = PatternFill("solid", fgColor="DDDDDD")
+    return {'title_font': title_font,
+            'text_font': text_font,
+            'title_alignment': title_alignment,
+            'text_alignment': text_alignment,
+            'borders_size': borders_size,
+            'fill_type': fill_type}
+
+
+def write_history_sheet(workbook: Workbook) -> True:
+    """
+
+    :param workbook: workbook
+    :return:
+    """
+    cell_styles: dict = set_cell_styles()
 
     hist_sheet = workbook.create_sheet(title='History')
     # Write to cell
     hist_sheet['A1'] = 'Date'
     hist_sheet['B1'] = 'Author'
     hist_sheet['C1'] = 'Location'
-    # Set fonts in title
+    # set cell styles for a title cell
     for cell in ["A1", "B1", "C1"]:
-        hist_sheet[cell].font = title_font
-        hist_sheet[cell].alignment = tile_alignment
-        hist_sheet[cell].fill = fill_type
-        hist_sheet[cell].border = borders_size
+        hist_sheet[cell].font = cell_styles['title_font']
+        hist_sheet[cell].alignment = cell_styles['title_alignment']
+        hist_sheet[cell].fill = cell_styles['fill_type']
+        hist_sheet[cell].border = cell_styles['borders_size']
 
     hist_sheet['A2'] = today_date.strftime("%d/%m/%Y")
     hist_sheet['B2'] = 'Julius Caesar'
@@ -81,15 +94,15 @@ def write_history_sheet(workbook: Workbook) -> True:
     hist_sheet['B3'] = 'Marcus Aurelio'
     hist_sheet['C3'] = 'Rome'
 
-    # set borders
+    # set cell styles for a normal text cell
     for col in ["A", "B", "C"]:
         for row in range(2, 4):
             # Create a cell as "A2", "B2" etc
             cell = col + str(row)
             # assign properties of a cell
-            hist_sheet[cell].font = text_font
-            hist_sheet[cell].alignment = text_alignment
-            hist_sheet[cell].border = borders_size
+            hist_sheet[cell].font = cell_styles['text_font']
+            hist_sheet[cell].alignment = cell_styles['text_alignment']
+            hist_sheet[cell].border = cell_styles['borders_size']
             if col == 'A':
                 hist_sheet[cell].font = Font(bold=True)
     return True
