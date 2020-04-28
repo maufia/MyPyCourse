@@ -1,9 +1,9 @@
 """Learn read/wrtire to excell spreadsheet"""
 
+import pprint
+from datetime import datetime, date
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
-from datetime import date
-import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -67,15 +67,14 @@ def set_cell_styles() -> dict:
             'fill_type': fill_type}
 
 
-def write_history_sheet(workbook: Workbook) -> True:
+def write_history_sheet(hist_sheet: dict) -> True:
     """
-
-    :param workbook: workbook
+    Write history sheet
+    :param hist_sheet: workbook'sheet
     :return:
     """
     cell_styles: dict = set_cell_styles()
 
-    hist_sheet = workbook.create_sheet(title='History')
     # Write to cell
     hist_sheet['A1'] = 'Date'
     hist_sheet['B1'] = 'Author'
@@ -108,23 +107,13 @@ def write_history_sheet(workbook: Workbook) -> True:
     return True
 
 
-def write_to_spreadsheet(filename: str, hills_of_rome: dict) -> True:
+def write_hills_sheet(hills_sheet: load_workbook, hills_of_rome: dict) -> True:
     """
-    Write the dictionary to spreadsheet
-
-    :param filename: string filename
-    :param hills_of_rome: dictionary with hills of rome
-
-    return: True
+    Write hills sheet
+    :param hills_of_rome: dictionary with details of hills of Rome
+    :param hills_sheet: workbook sheet for hills of Rome
+    :return: True
     """
-    # open workbook in memory
-    workbook = Workbook()
-    # Creates history sheet named 'History'
-
-    write_history_sheet(workbook)
-
-    # Creates sheet named 'Hills'
-    hills_sheet = workbook.create_sheet(title='Hills')
     # Create the first row with headings
     headings = ['English Name', 'Italian Name', 'Latin Name', 'Height [m]']
     # for each pattern name write to a column
@@ -146,6 +135,49 @@ def write_to_spreadsheet(filename: str, hills_of_rome: dict) -> True:
             hills_of_rome[hill]['Latin']
         hills_sheet.cell(row=row_count + 2, column=4).value = \
             hills_of_rome[hill]['Height']
+    return True
+
+
+def set_workbook_properties(workbook: Workbook) -> True:
+    """
+    Set properties of excel workbook
+    :param workbook: Workbook
+    :return:
+    """
+    # To get old properties
+    # obj = workbook.properties
+    # print(obj)
+
+    workbook.properties.creator = "Virgil"
+    workbook.properties.title = "Hills Of Rome"
+    workbook.properties.description = "Names of the Hills of Rome"
+    workbook.properties.subject = "Hills and Names"
+    workbook.properties.category = "Geographical"
+    workbook.properties.subject = "newSubject"
+    workbook.properties.created = datetime.now()
+    workbook.properties.keywords = "Hills, Height, Rome"
+    return True
+
+
+def write_to_spreadsheet(filename: str, hills_of_rome: dict) -> True:
+    """
+    Write the dictionary to spreadsheet
+
+    :param filename: string filename
+    :param hills_of_rome: dictionary with hills of rome
+
+    :return: True
+    """
+    # open workbook in memory
+    workbook = Workbook()
+    # Creates history sheet named 'History'
+    hist_sheet = workbook.create_sheet(title='History')
+    write_history_sheet(hist_sheet)
+    # Creates sheet named 'Hills'
+    hills_sheet = workbook.create_sheet(title='Hills')
+    write_hills_sheet(hills_sheet, hills_of_rome)
+    # Set workbook properties
+    set_workbook_properties(workbook)
     # delete default Sheet
     del workbook["Sheet"]
     print("Writing to file")
@@ -164,6 +196,8 @@ def read_spreadsheet(filename: str, sheetname: str) -> dict:
     return: hills of rome dictionary
     """
     print('Reading spreadsheet.')
+    # Prepare dictionary
+    hills_of_rome = {}
     try:
         # Open notebook
         workbook = load_workbook(filename=filename)
@@ -173,16 +207,15 @@ def read_spreadsheet(filename: str, sheetname: str) -> dict:
         print(f'File not found: {filename}')
     except KeyError:
         print(f'Sheet "{sheetname}" not found')
-    # Prepare dictionary
-    hills_of_rome = {}
-    # read every row
-    for row_count, sheet_row in enumerate(hills_sheet.rows):
-        if row_count == 0:
-            continue
-        hills_of_rome[sheet_row[0].value] = {
-            'Italian': sheet_row[1].value,
-            'Latin': sheet_row[2].value,
-            'Height': sheet_row[3].value}
+    finally:
+        # read every row
+        for row_count, sheet_row in enumerate(hills_sheet.rows):
+            if row_count == 0:
+                continue
+            hills_of_rome[sheet_row[0].value] = {
+                'Italian': sheet_row[1].value,
+                'Latin': sheet_row[2].value,
+                'Height': sheet_row[3].value}
     return hills_of_rome
 
 
