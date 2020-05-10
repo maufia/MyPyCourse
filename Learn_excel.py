@@ -11,7 +11,7 @@ today_date = date.today()
 
 
 def my_function() -> dict:
-    """Function creates a set of data into a dictionary"""
+    """Return a set of data into a dictionary"""
     hills_of_rome = {
         'Aventine Hill': {'Latin': 'Aventinus',
                           'Height': 46.6,
