@@ -5,15 +5,24 @@ import sys
 import random
 import click
 import pygame
+import math
+import time
 
 
-def random_direction(x_speed: int, y_speed: int) -> list:
+def random_direction(speed: float) -> list:
     """Generates a random direction and speed for the moving object
-    :param x_speed: speed on the x axis
-    :param y_speed: speed on the y axis
+    :param speed: speed on the x and y axis
     :return: a tuple with speeds which can be positive or negative
     """
-    return [x_speed * random.randint(-1, 1), y_speed * random.randint(-1, 1)]
+    angular_step: int = 10
+    directions = list(range(0, 360+angular_step, angular_step))
+    direction = random.choice(directions)
+    while 42:
+        if random.uniform(0, 1) > 0.95:
+            direction = random.choice(directions)
+        pos = [speed * math.cos(math.radians(direction)),
+               speed * math.sin(math.radians(direction))]
+        yield pos
 
 
 class MovingObject:
@@ -28,6 +37,7 @@ class MovingObject:
         self.size_field = size_field
         self.speed = speed
         self.dot, self.dot_rect = self.make_moving_item()
+        self.get_direction = random_direction(self.speed)
 
     def make_moving_item(self) -> tuple:
         """
@@ -44,8 +54,7 @@ class MovingObject:
     def get_next_location(self) -> pygame.Rect:
         """Get next location from speed
         """
-        dot_rect = self.dot_rect.move(random_direction(self.speed[0],
-                                                       self.speed[1]))
+        dot_rect = self.dot_rect.move(next(self.get_direction))
         self.dot_rect = self._check_edges(dot_rect)
         return self.dot_rect
 
@@ -63,7 +72,7 @@ class MovingObject:
             dot_rect[0] = 0
         if dot_rect[1] >= self.size_field[1]:
             dot_rect[1] = 0
-        print(dot_rect)
+        # print(dot_rect)
         return dot_rect
 
 
@@ -75,14 +84,13 @@ def start_game(n_moving_dots: int, size_field: list) -> True:
     :return: True
     """
     pygame.init()
-    x_speed, y_speed = 3, 3
+    speed = 3 * 1000 / 3600  #km/h -> m/s
     black = [0, 0, 0]
     screen = pygame.display.set_mode(size_field)
     # Create n moving dots, all randomly positioned in the field
-    dots = [MovingObject(size_field, [x_speed, y_speed]) for _ in range(n_moving_dots)]
+    dots = [MovingObject(size_field, speed) for _ in range(n_moving_dots)]
 
-    sys.exit()
-    for cnt in range(10):
+    for cnt in range(1000):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -90,6 +98,7 @@ def start_game(n_moving_dots: int, size_field: list) -> True:
         screen.fill(black)
         [screen.blit(d.dot, d.get_next_location()) for d in dots]
         pygame.display.flip()
+        # time.sleep(1)
 
     return True
 
