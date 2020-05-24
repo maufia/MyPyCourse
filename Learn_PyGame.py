@@ -1,7 +1,6 @@
 """Learn PyGame package with few examples"""
 
 import os
-import sys
 import random
 import click
 import pygame
@@ -22,9 +21,8 @@ def random_direction(speed: int) -> list:
         yield speed * x_direction, speed * y_direction
 
 
-class MovingObject:
+class MovingUEs:
     """Class for moving objects"""
-
     def __init__(self, size_field: list, speed: int):
         """
         Create a moving object
@@ -33,7 +31,7 @@ class MovingObject:
         """
         self.size_field = size_field
         self.speed = speed
-        self.dot, self.dot_rect = self.make_moving_item()
+        self.figure, self.rect = self.make_moving_item()
         self.get_direction = random_direction(self.speed)
 
     def make_moving_item(self) -> tuple:
@@ -42,20 +40,20 @@ class MovingObject:
         Random initialise position
         :return:  True
         """
-        dot = pygame.image.load(os.path.join('Images', 'star_blue.png'))
-        dot_rect = dot.get_rect()
-        dot_rect = dot_rect.move(random.randint(0, self.size_field[0]),
-                                 random.randint(0, self.size_field[1]))
-        return dot, dot_rect
+        figure = pygame.image.load(os.path.join('Images', 'star_blue.png'))
+        rect = figure.get_rect()
+        rect = rect.move(random.randint(0, self.size_field[0]),
+                         random.randint(0, self.size_field[1]))
+        return figure, rect
 
     def get_next_location(self) -> pygame.Rect:
         """Get next location from speed
         :return:
         """
         p = next(self.get_direction)
-        dot_rect = self.dot_rect.move(p[0], p[1])
-        self.dot_rect = self._check_edges(dot_rect)
-        return self.dot_rect
+        rect = self.rect.move(p[0], p[1])
+        self.rect = self._check_edges(rect)
+        return self.rect
 
     def _check_edges(self, dot_rect: pygame.Rect) -> pygame.Rect:
         """ Ensure that the dot is within the window
@@ -75,31 +73,84 @@ class MovingObject:
         return dot_rect
 
 
-def start_game(n_moving_dots: int, size_field: list) -> True:
+class CityBackground:
+    """ Create the fixed elements """
+    def __init__(self, size_field):
+        """
+        These elements depend on the size of the map
+
+        :param size_field: Size of the figure
+        """
+        self.surface = pygame.Surface(size_field).convert()
+        self._objects = []
+        self.add_city_map()
+        self.add_antennas(size_field)
+        self.generate_surface()
+
+    def add_city_map(self) -> True:
+        """Add the city map """
+        figure_pos = (0, 0)
+        city_map = pygame.image.load(os.path.join('Images',
+                                                  'city.png')).convert()
+        self._objects.append([city_map, figure_pos])
+        return True
+
+    def add_antennas(self, size_field) -> True:
+        """ Add the antennas
+
+        :param size_field: Size of the figure
+        :return: True
+        """
+        #  for figure_pos in []
+        return True
+
+    def generate_surface(self) -> True:
+        """
+
+        :return: True
+        """
+        [self.surface.blit(fig, pos) for fig, pos in self._objects]
+        return True
+
+
+def start_game(n_moving_ues: int, size_field: list) -> True:
     """ Set up pygame
 
-    :param n_moving_dots: number of moving dots
+    :param n_moving_ues: number of moving user equipment
     :param size_field: size of the field
     :return: True
     """
     pygame.init()
-    speeds = range(1, 4)
-    black = [0, 0, 0]
     screen = pygame.display.set_mode(size_field)
-    # Create n moving dots, all randomly positioned in the field
-    dots = [MovingObject(size_field, random.choice(speeds)) for _ in
-            range(n_moving_dots)]
+    pygame.display.set_caption("Learn_PyGame")
+    # Create n moving UEs, all randomly positioned in the field
+    speeds = range(1, 4)
+    user_equip = [MovingUEs(size_field, random.choice(speeds)) for _ in
+                  range(n_moving_ues)]
+    background = CityBackground(size_field)
     game_clock = pygame.time.Clock()
 
-    while 42:
-        game_clock.tick(50)  # framerate
+    run = True
+    pause = False
+    while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
-
-        screen.fill(black)
-        [screen.blit(d.dot, d.get_next_location()) for d in dots]
-        pygame.display.flip()
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    run = False
+                elif event.key == pygame.K_p:
+                    pause = not pause
+        if not pause:
+            game_clock.tick(50)  # framerate
+            screen.blit(background.surface, (0, 0))
+            [screen.blit(ue.figure, ue.get_next_location())
+             for ue in user_equip]
+            # pygame.display.update()
+            pygame.display.flip()
+        else:
+            pygame.time.delay(1000)  # just delay 1 sec
+    pygame.quit()
 
 
 def get_arguments() -> True:
@@ -123,7 +174,7 @@ def get_arguments() -> True:
         ctx.obj['n_moving_items'] = n_moving_items
         ctx.obj['size_field'] = size_field
 
-    @cli.command()
+    @cli.command('run')
     @click.pass_context
     def run_game(ctx):
         """Start the game"""
