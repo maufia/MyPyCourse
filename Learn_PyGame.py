@@ -101,11 +101,14 @@ class CityBackground:
         :param size_field: Size of the figure
         :return: True
         """
-        #  for figure_pos in []
+        antenna_pos = (size_field[0]/2, size_field[1]*0.97)
+        antenna_figure = pygame.image.load(os.path.join('Images',
+                                                        'antennas.png'))
+        self._objects.append([antenna_figure, antenna_pos])
         return True
 
     def generate_surface(self) -> True:
-        """
+        """ Generates the actual surface
 
         :return: True
         """
