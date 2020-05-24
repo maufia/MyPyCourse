@@ -42,7 +42,7 @@ class MovingObject:
         Random initialise position
         :return:  True
         """
-        dot = pygame.image.load(os.path.join('Images'dd.png'))
+        dot = pygame.image.load(os.path.join('Images', 'star_blue.png'))
         dot_rect = dot.get_rect()
         dot_rect = dot_rect.move(random.randint(0, self.size_field[0]),
                                  random.randint(0, self.size_field[1]))
